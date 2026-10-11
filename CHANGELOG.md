@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog],
 and this project adheres to [Semantic Versioning].
 
+## [2.5.0] - 2026-10-11
+
+### Added
+
+- **Five remaining migrated device descriptors**: the products left behind by the hardcoded-mapping → YAML descriptor migration now ship, each mirroring an existing sibling layout — HCT-611 water timer (`sfkzq`/`tqzkwarw`), LY curtain motor (`cl`/`ulughw4g`), HU06 Smart Lock (`jtmspro`/`stugc8dl`), TenixLox KB150A (`ms`/`0binhnjg`) and Pulido P13 (`ms`/`kdq0tdbz`). All five are catalogued in `SUPPORTED_DEVICES.md`.
+
+### Changed
+
+- **Protocol robustness** (`tuya_ble/`): decode well-formed 5-byte varints; isolate each registered callback so one failing callback can no longer abort the others; warn (with traceback) on recoverable connection/pairing errors; drop the `asyncio.sleep(0.01)` yield hack; use a byte-based local-key slice; pass `usedforsecurity=False` to every MD5 call; sort `__all__`; delete the dead `begin_update`/`end_update` machinery; and make `set_value_no_notify` type-strict (bytes-like for `DT_RAW`/`DT_BITMAP`, boolean for `DT_BOOL`).
+- **Climate**: apply `temperature_unit` when either the target or the current temperature data point is present, and resolve presets through an explicit reverse map instead of relying on data-point order.
+- **Cover / light / number**: gate cover features on their data points, batch light writes atomically, and round number values before sending.
+- **Availability**: `available` now also requires a successful coordinator update, so entities go unavailable instead of showing stale values while disconnected.
+- **Cleanup**: the dead `find_dpid`/`find_dpcode`/`_match_dpcode`/`get_dptype`/`_send_command` helpers are removed, the legacy unique-id suffix cache is evicted on unload, and `UNIT_CONVERSIONS`/`resolve_unit` move to `util.py` to be shared by `number.py` and `sensor.py`. The `wk` binary-sensor battery gets its name from `strings.json`/`translations/en.json`, and `CONTRIBUTING.md` states the Python 3.14.2+ floor.
+
+### Fixed
+
+- **HCT-611 water timer weather condition**: the `tqzkwarw` descriptor copied the SOP10 `no_forecast`/`sunny`/`cloudy`/`rainy` enum for DP 13, but the HCT-611 reports `sunny`/`clear`/`cloud`/`cloudy`/`rainy`/`snow`/`fog`. The options now match the device, so `clear`, `cloud`, `snow` and `fog` no longer render as unknown.
+- **Descriptor schema validation**: climate `hvac_modes` and `hvac_switch_mode` are validated against `HVACMode` at load time rather than failing later at runtime.
+
 ## [2.4.0] - 2026-10-10
 
 ### Changed
