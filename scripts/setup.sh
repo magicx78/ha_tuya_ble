@@ -22,10 +22,6 @@ fi
 scripts/startup.sh
 
 prek install -f
-if ! [ -x "$(command -v opencode)" ]; then
-  echo 'export PATH=/home/vscode/.opencode/bin:$PATH' >> ~/.zshrc
-  curl -fsSL --proto "=https" https://opencode.ai/install | bash
-fi
 
 if ! [ -e /opt/sonarqube-mcp/sonarqube-mcp-server.jar ]; then
   MCP_LISTING="https://binaries.sonarsource.com/s3api?delimiter=/&prefix=Distribution/sonarqube-mcp-server/"
