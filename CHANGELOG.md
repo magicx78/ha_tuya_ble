@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog],
 and this project adheres to [Semantic Versioning].
 
+## [2.5.1] - 2026-10-19
+
+### Fixed
+
+- **Diagnostics `cloud_info` no longer exports identifying fields**: the cloud device snapshot captured at setup copied every scalar field of the raw Tuya cloud payload, which — beyond version and product metadata — carries `ip`, `lat`, `lon`, `uid`, `owner_id`, `asset_id` and `time_zone`. Those reached the config entry and a diagnostics download (which the README asks users to attach to public issues). `capture_cloud_info` now uses an explicit allowlist of product/version fields (`category`, `product_id`, `product_name`, `product_model`, `pv`, `mcu_sw_version`, `sw_version`, `firmware_version`, `online`, `sub`, `support_local`) instead of a denylist, and stored snapshots captured under the old behaviour are filtered down on export as well — no entry rewrite needed. The same identifiers were also added to the diagnostics redaction set as defence in depth. Raised in the HACS default-submission review.
+
+### Changed
+
+- **`pycryptodome` is now a declared requirement**: `tuya_ble/base.py`, `tuya_ble/protocol_parse.py` and `tuya_ble/protocol_send.py` import `Crypto.Cipher`, but `pycryptodome` was only available because Home Assistant ships it for other integrations; `tuya-device-sharing-sdk` does not pull it in. It is now listed in `manifest.json` (`pycryptodome>=3.20.0`), per the HACS default-submission review.
+
 ## [2.5.0] - 2026-10-11
 
 ### Added
