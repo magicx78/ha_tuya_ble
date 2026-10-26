@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog],
 and this project adheres to [Semantic Versioning].
 
+## [2.6.0] - 2026-10-26
+
+### Added
+
+- **Parkside smart battery descriptors for the new 4 Ah and 8 Ah PIDs**: the 2026-generation Parkside smart batteries (`dcb`/`vllfabvs`, 4 Ah, and `dcb`/`r04rvmaq`, 8 Ah) now ship full YAML descriptors — battery percentage, pack and probe temperatures, charge/discharge current and voltage, charge and discharge cycle counters, the protection-event counters and fault state, alongside the tool-side sensors and configuration switches the battery reports. Both products are catalogued in `SUPPORTED_DEVICES.md`.
+- **Battery work mode select**: DP 105 exposes the pack's `Performance`, `Balanced` and `Eco` work modes as a config select on both new battery descriptors, and DP 115 adds an Identify switch that makes the pack signal its location.
+
+### Fixed
+
+- **Local datapoint values now roll back when a BLE write fails**: `TuyaBLEDataPoint.set_value` applied its new value optimistically but only the bulk path restored it when the send raised, so every entity on the single-DP write path (switch, select, number, text, button, lock, cover, climate, valve and the Fingerbot programs) kept reporting a value the device never accepted until the next device report. The single and bulk paths now share one `apply_with_rollback` helper: it restores the applied values when the send fails _or_ a value cannot be coerced — so a failed batch is no longer left half-applied — skips data points that changed again while the write was in flight (a device report or a concurrent write wins over the stale snapshot), and treats an unacknowledged write (no response before `RESPONSE_WAIT_TIMEOUT`) as an error that rolls back, instead of silently staying optimistic. Raised as an issue by the Sourcery review of the previous release's bulk-write rollback.
+
 ## [2.5.1] - 2026-10-19
 
 ### Fixed
