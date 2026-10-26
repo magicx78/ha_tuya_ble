@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from bleak_retry_connector import BLEAK_RETRY_EXCEPTIONS
+
 
 class TuyaBLEError(Exception):
     """Base class for Tuya BLE errors."""
@@ -55,3 +57,31 @@ class TuyaBLEDeviceError(TuyaBLEError):
 
     def __init__(self, code: int) -> None:
         super().__init__(f"BLE device returned error code {code}")
+
+
+class TuyaBLEResponseTimeoutError(TuyaBLEError):
+    """Raised when a sent packet gets no response before the timeout.
+
+    The transport already logs the sequence number, command and RSSI for the
+    timeout; this carries the failure out of `_send_packet` so callers react
+    instead of treating an unconfirmed packet as delivered — the datapoint
+    rollback path relies on it to restore local values after a write the
+    device never acknowledged.
+    """
+
+    def __init__(self, command: str) -> None:
+        super().__init__(
+            f"Timed out waiting for a response from the device to {command}"
+        )
+
+
+# BLEAK_RETRY_EXCEPTIONS includes AttributeError, which would otherwise make a
+# programming error (typo'd attribute, missing Protocol member, None access)
+# look like a transient BLE failure and be retried silently. Excluding it keeps
+# real bugs visible instead of presenting them as a flaky device.
+BLEAK_EXCEPTIONS = (
+    *(err for err in BLEAK_RETRY_EXCEPTIONS if err is not AttributeError),
+    OSError,
+)
+
+BLE_CONNECTION_EXCEPTIONS = (TuyaBLEError, *BLEAK_EXCEPTIONS)

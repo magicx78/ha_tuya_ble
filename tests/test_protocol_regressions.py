@@ -24,6 +24,7 @@ from custom_components.tuya_ble.tuya_ble.exceptions import (
     TuyaBLEDataLengthError,
     TuyaBLEDeviceError,
     TuyaBLEOutgoingDataLengthError,
+    TuyaBLEResponseTimeoutError,
 )
 from tests.conftest import make_credentials
 from tests.protocol_harness import ProtocolHarness, device_info_data
@@ -249,5 +250,57 @@ async def test_set_multiple_values_reverts_on_ble_write_failure(
         pytest.raises(BleakError),
     ):
         await h.device.set_multiple_values({1: True})
+
+    assert dp.value is False
+
+
+async def test_set_multiple_values_reverts_earlier_values_on_invalid_value(
+    h: ProtocolHarness,
+) -> None:
+    """A bad value later in the batch must not leave the earlier ones applied."""
+    h.device._protocol_version = 3
+    toggle = h.device.get_or_create_datapoint(1, TuyaBLEDataPointType.DT_BOOL, False)
+    raw = h.device.get_or_create_datapoint(2, TuyaBLEDataPointType.DT_RAW, b"")
+
+    with (
+        patch.object(h.device, "send_datapoints") as send,
+        pytest.raises(TuyaBLEDataFormatError),
+    ):
+        await h.device.set_multiple_values({1: True, 2: "not-bytes"})
+
+    assert toggle.value is False
+    assert raw.value == b""
+    send.assert_not_called()
+
+
+async def test_set_multiple_values_reverts_earlier_values_on_conversion_error(
+    h: ProtocolHarness,
+) -> None:
+    """A value int() cannot coerce must not leave the batch half-applied."""
+    h.device._protocol_version = 3
+    toggle = h.device.get_or_create_datapoint(1, TuyaBLEDataPointType.DT_BOOL, False)
+    target = h.device.get_or_create_datapoint(2, TuyaBLEDataPointType.DT_VALUE, 0)
+
+    with (
+        patch.object(h.device, "send_datapoints") as send,
+        pytest.raises(ValueError),
+    ):
+        await h.device.set_multiple_values({1: True, 2: "not-a-number"})
+
+    assert toggle.value is False
+    assert target.value == 0
+    send.assert_not_called()
+
+
+async def test_set_value_reverts_on_response_timeout(h: ProtocolHarness) -> None:
+    """A write the device never acknowledges must not stay optimistic."""
+    h.device._protocol_version = 3
+    dp = h.device.get_or_create_datapoint(1, TuyaBLEDataPointType.DT_BOOL, False)
+
+    with (
+        patch("asyncio.wait_for", side_effect=TimeoutError),
+        pytest.raises(TuyaBLEResponseTimeoutError),
+    ):
+        await dp.set_value(True)
 
     assert dp.value is False
