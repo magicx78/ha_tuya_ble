@@ -31,6 +31,11 @@ from .devices import (
 from .tuya_ble import TuyaBLEDataPointType, TuyaBLEDevice
 from .util import remap_value
 
+# Tuya "work_mode" enum indices. BLE carries enum values as integers, so the
+# names ("white", "colour") cannot be serialized as DT_ENUM.
+WORK_MODE_WHITE = 0
+WORK_MODE_COLOUR = 1
+
 
 @dataclass
 class TuyaBLELightMapping:
@@ -234,7 +239,10 @@ class TuyaBLELight(TuyaBLEEntity, LightEntity):
         """Return the current color mode."""
         if self._mapping.color_mode_dp_id != 0 and self._mapping.color_data_dp_id != 0:
             datapoint = self.device.datapoints[self._mapping.color_mode_dp_id]
-            if datapoint is not None and str(datapoint.value).lower() != "white":
+            if datapoint is not None and str(datapoint.value).lower() not in (
+                "white",
+                str(WORK_MODE_WHITE),
+            ):
                 return ColorMode.HS
         if self._mapping.color_temp_dp_id != 0:
             return ColorMode.COLOR_TEMP
@@ -258,7 +266,7 @@ class TuyaBLELight(TuyaBLEEntity, LightEntity):
                 commands.append({
                     "dp_id": self._mapping.color_mode_dp_id,
                     "dp_type": TuyaBLEDataPointType.DT_ENUM,
-                    "value": "white",
+                    "value": WORK_MODE_WHITE,
                 })
             mireds = color_util.color_temperature_kelvin_to_mired(
                 kwargs[ATTR_COLOR_TEMP_KELVIN]
@@ -284,7 +292,7 @@ class TuyaBLELight(TuyaBLEEntity, LightEntity):
                 commands.append({
                     "dp_id": self._mapping.color_mode_dp_id,
                     "dp_type": TuyaBLEDataPointType.DT_ENUM,
-                    "value": "colour",
+                    "value": WORK_MODE_COLOUR,
                 })
             hs_color = kwargs[ATTR_HS_COLOR]
             brightness = kwargs.get(ATTR_BRIGHTNESS, self.brightness or 0)

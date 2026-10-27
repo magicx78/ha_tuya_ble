@@ -206,6 +206,24 @@ async def test_color_mode_hs(hass: HomeAssistant) -> None:
     assert entity.color_mode == ColorMode.HS
 
 
+async def test_color_mode_white_from_enum_index(hass: HomeAssistant) -> None:
+    """Verify an integer white work_mode reported over BLE maps to COLOR_TEMP."""
+    device, coordinator, product = build_context(hass)
+    entity = _make_entity(hass, device, coordinator, product)
+    add_dp(device, 2, TuyaBLEDataPointType.DT_ENUM, light.WORK_MODE_WHITE)
+    add_dp(device, 5, TuyaBLEDataPointType.DT_STRING, "00e600640064")
+    assert entity.color_mode == ColorMode.COLOR_TEMP
+
+
+async def test_color_mode_hs_from_enum_index(hass: HomeAssistant) -> None:
+    """Verify an integer colour work_mode reported over BLE maps to HS."""
+    device, coordinator, product = build_context(hass)
+    entity = _make_entity(hass, device, coordinator, product)
+    add_dp(device, 2, TuyaBLEDataPointType.DT_ENUM, light.WORK_MODE_COLOUR)
+    add_dp(device, 5, TuyaBLEDataPointType.DT_STRING, "00e600640064")
+    assert entity.color_mode == ColorMode.HS
+
+
 # --- hs_color ---
 
 
@@ -317,7 +335,8 @@ async def test_turn_on_with_color_temp(hass: HomeAssistant) -> None:
     dp_mode = device.datapoints[2]
     dp_temp = device.datapoints[4]
     assert dp_mode is not None
-    assert dp_mode.value == "white"
+    assert dp_mode.value == light.WORK_MODE_WHITE
+    dp_mode.get_value()  # serializes for BLE without TuyaBLEDataFormatError
     assert dp_temp is not None
 
 
@@ -330,7 +349,8 @@ async def test_turn_on_with_hs_color(hass: HomeAssistant) -> None:
     dp_mode = device.datapoints[2]
     dp_color = device.datapoints[5]
     assert dp_mode is not None
-    assert dp_mode.value == "colour"
+    assert dp_mode.value == light.WORK_MODE_COLOUR
+    dp_mode.get_value()  # serializes for BLE without TuyaBLEDataFormatError
     assert dp_color is not None
     assert isinstance(dp_color.value, str)
     assert len(dp_color.value) == 12
@@ -450,7 +470,8 @@ async def test_turn_on_with_color_temp_and_mode_dp(hass: HomeAssistant) -> None:
     entity.turn_on(color_temp_kelvin=4000)
     dp_mode = device.datapoints[2]
     assert dp_mode is not None
-    assert dp_mode.value == "white"
+    assert dp_mode.value == light.WORK_MODE_WHITE
+    dp_mode.get_value()  # serializes for BLE without TuyaBLEDataFormatError
     dp_temp = device.datapoints[4]
     assert dp_temp is not None
 
@@ -462,7 +483,8 @@ async def test_turn_on_with_hs_color_and_mode_dp(hass: HomeAssistant) -> None:
     entity.turn_on(hs_color=(180.0, 50.0), brightness=128)
     dp_mode = device.datapoints[2]
     assert dp_mode is not None
-    assert dp_mode.value == "colour"
+    assert dp_mode.value == light.WORK_MODE_COLOUR
+    dp_mode.get_value()  # serializes for BLE without TuyaBLEDataFormatError
     dp_color = device.datapoints[5]
     assert dp_color is not None
     assert isinstance(dp_color.value, str)
