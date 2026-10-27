@@ -91,6 +91,12 @@ Entities: battery, temperature, charge/discharge current and voltage, tool diagn
 
 Entities: on/off, brightness, color temperature, RGB color.
 
+## Lights (category_id `dj`)
+
+- Tuya Smart LED Wall Lamp (product_id `joe8qqgiwhpqgwex`).
+
+Entities: on/off, brightness, color temperature, RGB color.
+
 ## Blind / curtain controllers (category_id `cl`)
 
 - Blind Controller (product_ids `4pbr8eig`, `vlwf3ud6`, `ulughw4g`).

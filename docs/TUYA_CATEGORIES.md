@@ -33,6 +33,7 @@ is how most of the categories below got their first device.
 | `zwjcy`   | Soil sensor - plant monitor (undocumented) |                                                                                                                                                                                                                     |
 | `co2bj`   | CO2 detector                               |                                                                                                                                                                                                                     |
 | `dd`      | Strip lights                               | Strip lights. `_category_dd.yaml` supplies the default `light` entity for every `dd` product that does not define its own.                                                                                          |
+| `dj`      | Light                                      | Light. `_category_dj.yaml` supplies the default `light` entity (DPs 20-24) for every `dj` product that does not define its own.                                                                                     |
 | `znhsb`   | Smart glass (not in Tuya's list)           | Officially _Smart glass_, but the `cdlandip` product here is a smart water bottle. See [gotchas](#gotchas).                                                                                                         |
 
 To see the products in a category:
@@ -90,7 +91,7 @@ all, so they have no row here — they are in the table above.
 | `dd`          | Strip lights                                                       |     ✓     |
 | `dghsxj`      | Smart Camera - Low power consumption camera (undocumented)         |           |
 | `dgnbj`       | Multi-functional alarm                                             |           |
-| `dj`          | Light                                                              |           |
+| `dj`          | Light                                                              |     ✓     |
 | `dlq`         | Circuit breaker                                                    |           |
 | `dr`          | Electric blanket                                                   |           |
 | `ds`          | TV set                                                             |           |
