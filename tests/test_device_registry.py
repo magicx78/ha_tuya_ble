@@ -1108,7 +1108,7 @@ def test_dj_wall_lamp_inherits_the_dj_light_mapping() -> None:
     assert product.device_name == "Smart LED Wall Lamp"
 
     light = product.get("light")
-    assert light, "dj/joe8qqgiwhpqgwex inherits no light mapping"
+    assert len(light) == 1, "dj/joe8qqgiwhpqgwex must inherit exactly one light mapping"
     assert light[0].translation_key == "switch_led"
     assert light[0].extra == {
         "switch_dp_id": 20,

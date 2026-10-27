@@ -58,7 +58,7 @@ These turn up in log lines and issue reports but are not categories with descrip
 
 The 138 category codes in Tuya's developer documentation, for reading a log line or a
 cloud response. Ones marked _undocumented_ are absent from that documentation but are known
-from shipped devices. ✓ marks the 13 of the 15 categories this integration supports that
+from shipped devices. ✓ marks the 14 of the 16 categories this integration supports that
 appear in Tuya's list. The other two, `dcb` and `znhsb`, are not in Tuya's documentation at
 all, so they have no row here — they are in the table above.
 
