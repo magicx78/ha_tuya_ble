@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog],
 and this project adheres to [Semantic Versioning].
 
+## [2.6.1-mx.1] - 2026-10-27
+
+Fork release of [magicx78/ha_tuya_ble](https://github.com/magicx78/ha_tuya_ble): upstream `main` after 2.6.0 plus the changes below. Same `tuya_ble` domain, so existing config entries are kept.
+
+### Added
+
+- **`dj` light category and Tuya Smart LED Wall Lamp**: `_category_dj.yaml` supplies a default `light` entity on the standard Tuya light DPs 20-24, and `dj`/`joe8qqgiwhpqgwex` (Smart LED Wall Lamp) inherits it.
+
+### Fixed
+
+- **Lights failed to switch between white and colour mode**: `work_mode` was written as the names `white`/`colour` with `DT_ENUM`, which BLE cannot serialize, so every colour-temperature or HS change raised `TuyaBLEDataFormatError`. The enum indices (white=0, colour=1) are sent instead, and a reported index `0` now counts as white mode. Affects every light with a `color_mode_dp_id`, including the `dd` strip lights.
+- **Parkside 2026 battery status order and discharging current unit** (upstream #111).
+
 ## [2.6.0] - 2026-10-26
 
 ### Added
