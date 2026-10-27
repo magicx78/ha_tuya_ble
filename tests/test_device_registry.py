@@ -929,6 +929,7 @@ _MANUFACTURER_FROM_PRODUCTS = {
     "ggq/jntxv3q4": "Insoma",
     "ggq/qycalacn": "Yohgee",
     "sfkzq/16wgjvck": "Ferrex",
+    "dcb/fab74vxu": "PARKSIDE",
     "dcb/r04rvmaq": "PARKSIDE",
     "dcb/vllfabvs": "PARKSIDE",
 }
@@ -941,7 +942,8 @@ _NAMES_FROM_PRODUCTS = {
 }
 
 # Products that had no descriptor of their own until their entities were lifted
-# out of the category defaults, plus the lock added in this change.
+# out of the category defaults, the lock added in a previous change, and the
+# 2026 Parkside 4 Ah battery (PAPP 204 A1) added for issue #103.
 _NEW_DESCRIPTORS = (
     "dd/0qgrjxum",
     "dd/6jxcdae1",
@@ -952,6 +954,7 @@ _NEW_DESCRIPTORS = (
     "jtmspro/stugc8dl",
     "ms/0binhnjg",
     "ms/kdq0tdbz",
+    "dcb/fab74vxu",
 )
 
 
@@ -1003,7 +1006,7 @@ def test_new_descriptors_are_registered(product_key: str) -> None:
 # "Full" never appeared -- the batteries report Ready once charged, not
 # Full. DP 101 is in amperes: declared as mA, a drill load showed up in HA
 # as 2 mA.
-_2026_PARKSIDE_BATTERIES = ("vllfabvs", "r04rvmaq")
+_2026_PARKSIDE_BATTERIES = ("fab74vxu", "vllfabvs", "r04rvmaq")
 
 
 @pytest.mark.parametrize("product_id", _2026_PARKSIDE_BATTERIES)
